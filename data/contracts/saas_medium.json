@@ -1,0 +1,122 @@
+{
+  "contract_id": "SAAS-2024-042",
+  "task_id": "task2",
+  "title": "Software as a Service Subscription Agreement",
+  "parties": ["CloudPlatform Inc.", "Enterprise Client Corp."],
+  "metadata": {
+    "effective_date": "2024-03-01",
+    "jurisdiction": "California, USA",
+    "governing_law": "California law",
+    "subscription_tier": "Enterprise"
+  },
+  "clauses": [
+    {
+      "id": "saas_c1",
+      "text": "CloudPlatform Inc. grants Enterprise Client Corp. a non-exclusive, non-transferable license to access and use the Software during the Subscription Term solely for Client's internal business purposes.",
+      "clause_type": "ip_ownership",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c2",
+      "text": "ALL INTELLECTUAL PROPERTY RIGHTS IN ANY WORK PRODUCT, CUSTOMIZATIONS, OR MODIFICATIONS CREATED BY EITHER PARTY IN CONNECTION WITH THIS AGREEMENT SHALL AUTOMATICALLY VEST IN AND BECOME THE SOLE PROPERTY OF CLOUDPLATFORM INC., INCLUDING ANY DERIVATIVE WORKS BASED ON CLIENT'S DATA OR WORKFLOWS.",
+      "clause_type": "ip_ownership",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c3",
+      "text": "Client acknowledges and agrees that CloudPlatform may collect, use, and analyze Client Data and usage information for product improvement purposes. CloudPlatform may share aggregated and de-identified data with third parties for marketing and benchmarking purposes without Client's consent.",
+      "clause_type": "data_privacy",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c4",
+      "text": "CloudPlatform will process personal data in accordance with its Privacy Policy and applicable data protection laws, including GDPR where applicable. CloudPlatform will implement appropriate technical and organizational measures to protect personal data.",
+      "clause_type": "data_privacy",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c5",
+      "text": "CloudPlatform shall use commercially reasonable efforts to ensure the Software is available 99.5% of the time in any given calendar month, excluding scheduled maintenance windows of up to 8 hours per week.",
+      "clause_type": "sla_penalty",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c6",
+      "text": "In the event of an SLA breach, Client's sole and exclusive remedy shall be a service credit equal to 5% of the monthly fee for each hour of downtime in excess of the permitted downtime, up to a maximum credit of 10% of the monthly subscription fee. CloudPlatform expressly disclaims all other liability for SLA breaches.",
+      "clause_type": "sla_penalty",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c7",
+      "text": "Client shall pay all subscription fees in advance on a monthly basis. Fees are non-refundable under all circumstances including early termination, service outages, or dissatisfaction with the service.",
+      "clause_type": "payment",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c8",
+      "text": "CloudPlatform reserves the right to increase subscription fees at any time upon 7 days' written notice. Continued use of the service after the notice period shall constitute acceptance of the new fees.",
+      "clause_type": "payment",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c9",
+      "text": "Either party may terminate this Agreement for convenience upon 30 days' written notice. CloudPlatform may terminate immediately upon any alleged breach by Client.",
+      "clause_type": "termination",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c10",
+      "text": "Upon termination, Client will have 30 days to export its data. Thereafter, CloudPlatform may permanently delete all Client data without any further obligation to preserve or return such data.",
+      "clause_type": "termination",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c11",
+      "text": "Each party agrees to keep confidential all non-public information disclosed by the other party, using at least the same degree of care it uses to protect its own confidential information, but in no event less than reasonable care.",
+      "clause_type": "data_privacy",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c12",
+      "text": "Client is responsible for maintaining the security of its account credentials. CloudPlatform shall not be liable for any unauthorized access resulting from Client's failure to maintain adequate security practices.",
+      "clause_type": "data_privacy",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c13",
+      "text": "CLOUDPLATFORM'S TOTAL AGGREGATE LIABILITY FOR ANY AND ALL CLAIMS ARISING UNDER OR RELATED TO THIS AGREEMENT SHALL NOT EXCEED THE GREATER OF (A) THE FEES PAID IN THE ONE MONTH IMMEDIATELY PRECEDING THE CLAIM OR (B) ONE THOUSAND DOLLARS ($1,000), REGARDLESS OF THE FORM OF ACTION.",
+      "clause_type": "liability",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c14",
+      "text": "Client represents and warrants that it will comply with all applicable laws and regulations in connection with its use of the Software, including data protection and privacy laws.",
+      "clause_type": "general",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c15",
+      "text": "Any disputes arising out of this Agreement shall be resolved by binding arbitration in San Francisco, California, in accordance with the rules of JAMS. The parties waive their rights to a jury trial.",
+      "clause_type": "general",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c16",
+      "text": "Client grants CloudPlatform an irrevocable, perpetual, royalty-free license to use Client's name and logo in CloudPlatform's marketing materials, press releases, and investor presentations without prior approval.",
+      "clause_type": "ip_ownership",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c17",
+      "text": "This Agreement, together with all Order Forms and exhibits, constitutes the entire agreement between the parties concerning its subject matter and supersedes all prior agreements and understandings.",
+      "clause_type": "general",
+      "risk_level": null
+    },
+    {
+      "id": "saas_c18",
+      "text": "CloudPlatform may subcontract any of its obligations under this Agreement to third parties, including moving Client data to third-party infrastructure providers in any jurisdiction worldwide, without notification to Client.",
+      "clause_type": "data_privacy",
+      "risk_level": null
+    }
+  ]
+}

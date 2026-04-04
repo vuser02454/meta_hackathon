@@ -1,0 +1,9 @@
+name: legal-contract-review
+version: 1.0.0
+tasks:
+  - id: task1
+    difficulty: easy
+  - id: task2
+    difficulty: medium
+  - id: task3
+    difficulty: hard
