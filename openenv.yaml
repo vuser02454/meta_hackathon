@@ -1,9 +1,13 @@
-name: legal-contract-review
-version: 1.0.0
+version: "1.0"
+name: "Legal Contract Review OpenEnv"
+description: "Forensic legal contract review evaluating NDA, SaaS, and M&A logic."
+
+entry_point: "app.environment:LegalContractEnv"
+
 tasks:
-  - id: task1
-    difficulty: easy
-  - id: task2
-    difficulty: medium
-  - id: task3
-    difficulty: hard
+  - id: nda_review
+    description: "Easy NDA review with 10 exact steps."
+  - id: saas_review
+    description: "Medium SaaS review with 15 exact steps."
+  - id: ma_review
+    description: "Hard M&A review with 20 exact steps."
