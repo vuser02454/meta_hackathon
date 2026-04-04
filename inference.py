@@ -95,7 +95,8 @@ def run_task(env: LegalContractEnv, task_id: str, client: OpenAI):
             )
             
         state, reward, done = env.step(action)
-        print(f"[STEP] clause={clause['id']} action={action.action.value} reward={reward}")
+        # Using action.action directly since use_enum_values=True in Pydantic models
+        print(f"[STEP] clause={clause['id']} action={action.action} reward={reward:.2f}")
         
     score = env.grade()
     print(f"[END] task_id={task_id} score={score:.4f}")
