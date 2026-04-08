@@ -3,8 +3,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import os
-from app.environment import LegalContractEnv
-from app.models import State, ActionParams
+from server.environment import LegalContractEnv
+from server.models import State, ActionParams
 
 app = FastAPI(title="Legal Contract Review Hackathon Env")
 env = LegalContractEnv()
@@ -52,7 +52,6 @@ def state():
         raise HTTPException(status_code=400, detail="Environment not reset")
     return env.state
 
-def start():
+def main():
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=7860)
-
+    uvicorn.run("server.app:app", host="0.0.0.0", port=7860)

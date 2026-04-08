@@ -1,5 +1,5 @@
 from typing import Tuple, Dict, Any
-from app.models import State, ActionParams
+from server.models import State, ActionParams
 
 class LegalContractEnv:
     def __init__(self):
