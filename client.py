@@ -4,7 +4,7 @@ import time
 import psutil
 from openai import OpenAI
 from server.environment import LegalContractEnv
-from server.models import ActionParams
+from models import ActionParams
 from server.graders import Grader
 
 def log_start(task: str, env: str, model: str) -> None:

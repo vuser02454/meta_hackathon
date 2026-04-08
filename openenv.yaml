@@ -2,7 +2,7 @@ version: "1.0"
 name: "Legal Contract Review OpenEnv"
 description: "Forensic legal contract review evaluating NDA, SaaS, and M&A logic."
 
-entry_point: "app.environment:LegalContractEnv"
+entry_point: "server.environment:LegalContractEnv"
 
 tasks:
   - id: nda_review

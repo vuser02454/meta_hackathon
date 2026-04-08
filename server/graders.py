@@ -1,4 +1,4 @@
-from server.models import State
+from models import State
 
 class Grader:
     def score(self, state: State) -> float:
