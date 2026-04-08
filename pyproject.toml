@@ -7,7 +7,7 @@ name = "legal-contract-review"
 version = "0.1.0"
 description = "OpenEnv container for AI legal contract review testing"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.100.0",
     "uvicorn>=0.22.0",
