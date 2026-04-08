@@ -51,3 +51,8 @@ def state():
     if env.state is None:
         raise HTTPException(status_code=400, detail="Environment not reset")
     return env.state
+
+def start():
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=7860)
+
