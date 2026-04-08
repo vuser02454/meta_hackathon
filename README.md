@@ -1,3 +1,15 @@
+---
+title: Legal Contract Review (OpenEnv)
+emoji: ⚖️
+colorFrom: gray
+colorTo: blue
+sdk: docker
+pinned: false
+license: mit
+tags:
+  - openenv
+---
+
 # Technical Project Summary: Legal Contract Review OpenEnv
 **Official Submission for the Scaler × Meta/PyTorch OpenEnv Hackathon**
 
