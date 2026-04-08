@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Review - OpenEnv</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <aside class="sidebar">
+            <header>
+                <h1>Legal Review</h1>
+                <p>OpenEnv Validation Dashboard</p>
+            </header>
+            
+            <section class="config-section">
+                <label for="task-select">Select Review Task</label>
+                <div class="select-wrapper">
+                    <select id="task-select">
+                        <option value="nda_review">NDA Review (10 Steps)</option>
+                        <option value="saas_review">SaaS Review (15 Steps)</option>
+                        <option value="ma_review">M&A Review (20 Steps)</option>
+                    </select>
+                </div>
+                <button id="start-btn" class="primary-btn">Begin Evaluation</button>
+            </section>
+
+            <section class="stats-section" id="stats-section" style="display: none;">
+                <div class="stat-block">
+                    <span class="stat-label">Progress</span>
+                    <span class="stat-value"><span id="step-count">0</span> / <span id="total-count">0</span></span>
+                </div>
+                <div class="stat-block">
+                    <span class="stat-label">Cumulative Reward</span>
+                    <span class="stat-value" id="reward-value">0.00</span>
+                </div>
+                <div class="stat-block">
+                    <span class="stat-label">Flags Raised</span>
+                    <span class="stat-value" id="flags-value">0</span>
+                </div>
+            </section>
+        </aside>
+
+        <main class="review-area">
+            <div class="initial-state" id="initial-state">
+                <div class="placeholder-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                </div>
+                <p>Select a task and begin evaluation to view contract clauses.</p>
+            </div>
+
+            <div class="document-container" id="document-container" style="display: none;">
+                <div class="clause-header">
+                    <span class="clause-id" id="clause-id">Clause ID</span>
+                    <span class="clause-category" id="clause-category">Category</span>
+                </div>
+
+                <div class="clause-content">
+                    <p id="clause-text">Loading clause text...</p>
+                </div>
+
+                <div class="action-board">
+                    <button class="action-btn flag" data-action="flag">Flag</button>
+                    <button class="action-btn redline" data-action="redline">Redline</button>
+                    <button class="action-btn escalate" data-action="escalate">Escalate</button>
+                    <button class="action-btn synthesize" data-action="synthesize">Synthesize</button>
+                </div>
+            </div>
+            
+            <div id="results-panel" class="results-panel" style="display: none;">
+                <h2>Evaluation Complete</h2>
+                <div class="final-score">
+                    <span class="score-label">Final Grade</span>
+                    <span class="score-value" id="final-score">0.00</span>
+                </div>
+                <button id="restart-btn" class="secondary-btn">Start New Review</button>
+            </div>
+        </main>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

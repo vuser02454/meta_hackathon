@@ -1,10 +1,21 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
+import os
 from app.environment import LegalContractEnv
 from app.models import State, ActionParams
 
 app = FastAPI(title="Legal Contract Review Hackathon Env")
 env = LegalContractEnv()
+
+static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+    @app.get("/")
+    def serve_index():
+        return FileResponse(os.path.join(static_dir, "index.html"))
 
 class ResetRequest(BaseModel):
     task_id: str
