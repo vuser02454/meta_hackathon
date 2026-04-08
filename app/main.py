@@ -17,17 +17,20 @@ if os.path.exists(static_dir):
     def serve_index():
         return FileResponse(os.path.join(static_dir, "index.html"))
 
+from typing import Optional
+
 class ResetRequest(BaseModel):
-    task_id: str
+    task_id: str = "nda_review"
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 @app.post("/reset", response_model=State)
-def reset(request: ResetRequest):
+def reset(request: Optional[ResetRequest] = None):
+    task_id = request.task_id if request else "nda_review"
     try:
-        return env.reset(request.task_id)
+        return env.reset(task_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
