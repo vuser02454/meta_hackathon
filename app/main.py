@@ -58,8 +58,14 @@ def state():
     return env.state
 
 def main():
+    """Main entry point for the server."""
     import uvicorn
+    # Use the module path for the app string to support multi-mode deployment
     uvicorn.run("app.main:app", host="0.0.0.0", port=7860)
+
+def start():
+    """Alias for main() to support various validator versions."""
+    main()
 
 if __name__ == "__main__":
     main()
