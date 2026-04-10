@@ -12,4 +12,4 @@ COPY . .
 EXPOSE 7860
 
 # Adjust uvicorn to find server.app now that paths have changed
-CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]

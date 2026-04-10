@@ -3,9 +3,9 @@ import json
 import time
 import psutil
 from openai import OpenAI
-from server.environment import LegalContractEnv
-from models import ActionParams
-from server.graders import Grader
+from app.environment import LegalContractEnv
+from app.models import ActionParams
+from app.graders import Grader
 
 def log_start(task: str, env: str, model: str) -> None:
     print(f"[START] task={task} env={env} model={model}", flush=True)
