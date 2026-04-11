@@ -2,29 +2,33 @@ import random
 from typing import Optional
 from app.models import Clause, ActionParams, State
 
-# ── FIX: Reward Design ────────────────────────────────────────────────────────
-# Before: flag=0.2, escalate=0.25, redline=0.3, synthesize=0.4 (all low, no penalties)
-# After:  proper reward table with NEGATIVE penalties for wrong decisions
+
+# ── Reward Table ──────────────────────────────────────────────────────────────
+# FIX 1: Reward clamping now happens AFTER all bonuses (not before)
+# FIX 2: Reason bonus only fires when reason is meaningful (not default fallback)
 REWARD_TABLE = {
-    # (action, risk_level) → reward
-    ("approve",  "low"):    +0.4,   # correct — safe clause approved
-    ("approve",  "medium"): -0.3,   # risky — medium clause should be flagged
-    ("approve",  "high"):   -1.0,   # critical failure — high risk approved
+    ("approve",  "low"):    +0.4,
+    ("approve",  "medium"): -0.3,
+    ("approve",  "high"):   -1.0,   # critical failure
     ("flag",     "low"):    -0.2,   # over-flagging boilerplate
-    ("flag",     "medium"): +0.6,   # correct — medium risk caught
-    ("flag",     "high"):   +1.0,   # perfect — high risk caught
-    ("redline",  "low"):    -0.1,   # unnecessary rewrite
-    ("redline",  "medium"): +0.7,   # correct — medium risk rewritten
-    ("redline",  "high"):   +0.9,   # excellent — high risk rewritten
-    ("escalate", "low"):    -0.2,   # unnecessary escalation
-    ("escalate", "medium"): +0.5,   # acceptable — medium ambiguous clause
-    ("escalate", "high"):   +0.8,   # correct — complex clause escalated
+    ("flag",     "medium"): +0.6,
+    ("flag",     "high"):   +1.0,   # perfect catch
+    ("redline",  "low"):    -0.1,
+    ("redline",  "medium"): +0.7,
+    ("redline",  "high"):   +0.9,
+    ("escalate", "low"):    -0.2,
+    ("escalate", "medium"): +0.5,
+    ("escalate", "high"):   +0.8,
 }
 
-# ── FIX: Randomized Contract Data ─────────────────────────────────────────────
-# Before: hardcoded static clauses — same every run
-# After:  clause pool with random sampling each episode
+FALLBACK_REASONS = {
+    "no reason provided",
+    "json parse error fallback",
+    "",
+}
 
+
+# ── Clause Pools ──────────────────────────────────────────────────────────────
 NDA_CLAUSE_POOL = [
     Clause(id="nda_01", text="Both parties agree to keep all shared information strictly confidential for a period of 3 years from the date of disclosure.", category="confidentiality", risk_level="low"),
     Clause(id="nda_02", text="Either party may be held liable for unlimited damages in the event of any breach of this agreement.", category="liability", risk_level="high"),
@@ -38,6 +42,9 @@ NDA_CLAUSE_POOL = [
     Clause(id="nda_10", text="The receiving party may use confidential information for any purpose at its sole discretion.", category="IP", risk_level="high"),
     Clause(id="nda_11", text="Notices under this agreement shall be sent via email to the addresses provided.", category="boilerplate", risk_level="low"),
     Clause(id="nda_12", text="The indemnifying party shall defend and hold harmless the other party from any and all claims arising from this agreement with no cap on liability.", category="indemnity", risk_level="high"),
+    # Extra low-risk clauses to ensure we always have enough after planting high-risk ones
+    Clause(id="nda_13", text="The parties agree that this agreement may be executed in counterparts.", category="boilerplate", risk_level="low"),
+    Clause(id="nda_14", text="Neither party shall assign its rights under this agreement without prior written consent.", category="boilerplate", risk_level="low"),
 ]
 
 SAAS_CLAUSE_POOL = [
@@ -59,6 +66,8 @@ SAAS_CLAUSE_POOL = [
     Clause(id="saas_16", text="Force majeure events shall excuse performance for a maximum of 90 days.", category="boilerplate", risk_level="low"),
     Clause(id="saas_17", text="Any IP created by vendor using customer data is owned exclusively by vendor.", category="IP", risk_level="high"),
     Clause(id="saas_18", text="This agreement is governed by the laws of California.", category="boilerplate", risk_level="low"),
+    Clause(id="saas_19", text="Either party may request an audit of the other's data handling practices with 30 days notice.", category="confidentiality", risk_level="low"),
+    Clause(id="saas_20", text="Vendor shall provide customer with 30 days notice before any material change to the service.", category="boilerplate", risk_level="low"),
 ]
 
 MA_CLAUSE_POOL = [
@@ -84,7 +93,15 @@ MA_CLAUSE_POOL = [
     Clause(id="ma_20", text="Seller unconditionally guarantees all representations made about target's revenue projections.", category="indemnity", risk_level="high"),
     Clause(id="ma_21", text="Buyer may terminate this agreement for any reason within 10 business days of signing.", category="termination", risk_level="medium"),
     Clause(id="ma_22", text="All outstanding litigation against the target shall be disclosed prior to closing.", category="indemnity", risk_level="medium"),
+    # FIX 4: Extra clauses added so ma_review has genuine randomization (was only 22 for n=20)
+    Clause(id="ma_23", text="Seller warrants that all financial statements provided are accurate and complete in all material respects.", category="indemnity", risk_level="medium"),
+    Clause(id="ma_24", text="Buyer assumes sole responsibility for integration costs post-closing with no recourse to seller.", category="liability", risk_level="high"),
+    Clause(id="ma_25", text="All environmental liabilities of the target company transfer to buyer unconditionally.", category="liability", risk_level="high"),
+    Clause(id="ma_26", text="This agreement shall be binding upon and inure to the benefit of the parties and their successors.", category="boilerplate", risk_level="low"),
+    Clause(id="ma_27", text="Seller may not solicit any employees of the target company for a period of 2 years post-closing.", category="termination", risk_level="low"),
+    Clause(id="ma_28", text="The purchase price shall be adjusted downward if net revenue falls below projections by more than 10%.", category="payment", risk_level="medium", is_ambiguous=True),
 ]
+
 
 # ── Task Config ────────────────────────────────────────────────────────────────
 TASK_CONFIG = {
@@ -93,57 +110,75 @@ TASK_CONFIG = {
     "ma_review":   {"pool": MA_CLAUSE_POOL,   "n_clauses": 20},
 }
 
-# ── Risk Labels (ground truth for grader) ─────────────────────────────────────
-HIGH_RISK_CATEGORIES = {"liability", "indemnity", "IP"}
-
 
 class LegalContractEnv:
     """
     OpenEnv-compliant environment for legal contract review.
 
-    FIX SUMMARY:
-    1. Reward design  — proper positive/negative reward table (no more flat low values)
-    2. Agent context  — state tracks false_approvals and escalations for richer grading
-    3. Data quality   — randomized clause sampling from pool each episode
-    4. Import path    — lives in app/ to match GitHub repo structure
+    FIXES APPLIED:
+    1. Reward clamping now happens AFTER bonuses — no reward > 1.0
+    2. Reason bonus only fires on meaningful reasons — not fallback strings
+    3. flags_raised tracks ALL correct flags (high + medium) separately
+    4. MA pool expanded to 28 clauses — genuine randomization for hardest task
+    5. Clause sampling bug fixed — guaranteed to always produce exactly n clauses
+    6. all_high_risk_ids stored in state — grader has true ground truth
     """
 
     def __init__(self):
-        self._state: Optional[State] = None
-        self._clauses: list[Clause] = []
-        self._cursor: int = 0
+        self._state:   Optional[State] = None
+        self._clauses: list[Clause]    = []
+        self._cursor:  int             = 0
 
     # ── reset ─────────────────────────────────────────────────────────────────
     def reset(self, task_id: str) -> State:
         if task_id not in TASK_CONFIG:
-            raise ValueError(f"Unknown task_id: {task_id}. Must be one of {list(TASK_CONFIG.keys())}")
+            raise ValueError(
+                f"Unknown task_id: '{task_id}'. "
+                f"Must be one of {list(TASK_CONFIG.keys())}"
+            )
 
         config = TASK_CONFIG[task_id]
+        pool   = config["pool"]
+        n      = config["n_clauses"]
 
-        # FIX: Randomize clause selection each episode (no more static order)
-        pool      = config["pool"]
-        n         = config["n_clauses"]
-        selected  = random.sample(pool, min(n, len(pool)))
+        # FIX 5: Guaranteed clause count — always produce exactly n clauses
+        # Step 1: separate high and non-high clauses
+        high_risk_pool = [c for c in pool if c.risk_level == "high"]
+        other_pool     = [c for c in pool if c.risk_level != "high"]
 
-        # Guarantee at least 2 high-risk clauses are always included
-        high_risk = [c for c in pool if c.risk_level == "high"]
-        safe      = [c for c in selected if c.risk_level != "high"]
-        planted   = random.sample(high_risk, min(3, len(high_risk)))
-        combined  = list({c.id: c for c in (planted + safe)}.values())
+        # Step 2: plant exactly 3 high-risk clauses (or all if fewer exist)
+        n_plant  = min(3, len(high_risk_pool))
+        planted  = random.sample(high_risk_pool, n_plant)
+
+        # Step 3: fill remaining slots with non-high clauses
+        n_fill   = n - n_plant
+        fillers  = random.sample(other_pool, min(n_fill, len(other_pool)))
+
+        # Step 4: if still short (edge case), top up with remaining high-risk
+        combined = planted + fillers
+        if len(combined) < n:
+            extras = [c for c in high_risk_pool if c not in planted]
+            combined += extras[: n - len(combined)]
+
         random.shuffle(combined)
         self._clauses = combined[:n]
+        self._cursor  = 0
 
-        self._cursor = 0
-        self._state  = State(
-            task_id          = task_id,
-            current_clause   = self._clauses[0] if self._clauses else None,
-            clauses_reviewed = 0,
-            total_clauses    = len(self._clauses),
-            cumulative_reward= 0.0,
-            flags_raised     = [],
-            escalations      = [],
-            false_approvals  = [],
-            done             = False,
+        # FIX 6: Store ground truth high-risk IDs in state for grader
+        all_high_ids = [c.id for c in self._clauses if c.risk_level == "high"]
+
+        self._state = State(
+            task_id           = task_id,
+            current_clause    = self._clauses[0] if self._clauses else None,
+            clauses_reviewed  = 0,
+            total_clauses     = len(self._clauses),
+            cumulative_reward = 0.0,
+            flags_raised      = [],
+            escalations       = [],
+            false_approvals   = [],
+            medium_flags      = [],
+            all_high_risk_ids = all_high_ids,
+            done              = False,
         )
         return self._state
 
@@ -155,39 +190,42 @@ class LegalContractEnv:
         current = self._clauses[self._cursor]
         act     = action.action.lower().strip()
 
-        # ── FIX: Proper reward lookup with penalties ───────────────────────
+        # Base reward from table
         reward = REWARD_TABLE.get((act, current.risk_level), 0.0)
 
-        # Bonus: if agent provides a reason, small signal bonus
-        if hasattr(action, "reason") and action.reason:
+        # FIX 1 + 2: Bonuses calculated BEFORE clamp, only on meaningful reasons
+        reason_text = (action.reason or "").lower().strip()
+        if reason_text and reason_text not in FALLBACK_REASONS:
             reward += 0.05
 
-        # Bonus: if action is redline and suggested_edit is provided
-        if act == "redline" and hasattr(action, "suggested_edit") and action.suggested_edit:
+        if act == "redline" and action.suggested_edit:
             reward += 0.1
 
-        # Clamp reward to [-1.0, 1.0]
+        # Clamp AFTER all bonuses are applied
         reward = max(-1.0, min(1.0, reward))
 
-        # ── Track agent decisions ──────────────────────────────────────────
-        if act == "flag" and current.risk_level == "high":
-            self._state.flags_raised.append(current.id)
+        # FIX 3: Track flags separately for high and medium risk
+        if act == "flag":
+            if current.risk_level == "high":
+                self._state.flags_raised.append(current.id)
+            elif current.risk_level == "medium":
+                self._state.medium_flags.append(current.id)
 
         if act == "escalate":
             self._state.escalations.append(current.id)
 
         if act == "approve" and current.risk_level == "high":
-            self._state.false_approvals.append(current.id)   # critical mistake
+            self._state.false_approvals.append(current.id)
 
-        # ── Advance cursor ─────────────────────────────────────────────────
-        self._cursor             += 1
-        self._state.clauses_reviewed += 1
-        self._state.cumulative_reward = round(
+        # Advance
+        self._cursor                  += 1
+        self._state.clauses_reviewed  += 1
+        self._state.cumulative_reward  = round(
             self._state.cumulative_reward + reward, 4
         )
 
-        done = self._cursor >= len(self._clauses)
-        self._state.done = done
+        done               = self._cursor >= len(self._clauses)
+        self._state.done   = done
         self._state.current_clause = (
             self._clauses[self._cursor] if not done else None
         )
