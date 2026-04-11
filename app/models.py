@@ -7,7 +7,9 @@ class CurrentClause(BaseModel):
     category: str = Field(..., description="The legal category of the clause")
 
 class ActionParams(BaseModel):
-    action: str = Field(..., description="Action to take: flag, redline, escalate, synthesize")
+    action: str = Field(..., description="Action to take: flag, redline, escalate, approve")
+    reason: str = Field(default="", description="The step-by-step reasoning for the action")
+    suggested_edit: str = Field(default="", description="The text of the suggested edit if applicable")
 
 class State(BaseModel):
     task_id: str = Field(..., description="The current task identifier: nda_review, saas_review, ma_review")
