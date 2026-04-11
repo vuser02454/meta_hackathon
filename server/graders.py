@@ -1,4 +1,4 @@
-from app.models import State
+from .models import State
 
 
 class Grader:

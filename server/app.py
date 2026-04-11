@@ -61,7 +61,7 @@ def main():
     """Main entry point for the server."""
     import uvicorn
     # Use the module path for the app string to support multi-mode deployment
-    uvicorn.run("app.main:app", host="0.0.0.0", port=7860)
+    uvicorn.run("server.app:app", host="0.0.0.0", port=7860)
 
 def start():
     """Alias for main() to support various validator versions."""

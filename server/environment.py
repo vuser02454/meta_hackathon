@@ -1,6 +1,6 @@
 import random
 from typing import Optional
-from app.models import Clause, ActionParams, State
+from .models import Clause, ActionParams, State
 
 
 # ── Reward Table ──────────────────────────────────────────────────────────────

@@ -4,9 +4,9 @@ import time
 import psutil
 from openai import OpenAI
 
-from app.environment import LegalContractEnv
-from app.models      import ActionParams
-from app.graders     import Grader
+from server.environment import LegalContractEnv
+from server.models      import ActionParams
+from server.graders     import Grader
 
 # ── Hard Constraints ──────────────────────────────────────────────────────────
 API_BASE_URL     = os.environ.get("API_BASE_URL", "")
