@@ -1,3 +1,16 @@
+---
+title: Legal Contract Review (OpenEnv)
+emoji: ⚖️
+colorFrom: gray
+colorTo: blue
+sdk: docker
+pinned: false
+license: mit
+app_port: 7860
+tags:
+  - openenv
+---
+
 # Technical Project Summary: Legal Contract Review OpenEnv
 **Official Submission for the Scaler × Meta/PyTorch OpenEnv Hackathon**
 
@@ -18,14 +31,18 @@ The framework enforces absolute compliance with the Hackathon network constraint
 *   **Server Stability**: Agent state persists in continuous memory without server restarts between steps. All malformed inputs and invalid requests return proper HTTP error responses (not just schema errors) without crashing the service.
 
 ## 3. RL Architecture & Authorized Actions
-Agents execute exactly four authorized actions. All unapproved action strings are rejected natively.
+Agents execute exactly four authorized actions matching the OpenEnv Pydantic `ActionParams` model:
+*   **`flag`**: `0.2` (identifies problematic clause)
+*   **`escalate`**: `0.25` (passes to human counsel)
+*   **`redline`**: `0.3` (mutates the clause text directly)
+*   **`synthesize`**: `0.4` (generates missing required clauses)
 
-ALL rewards are floating-point values. ALL rewards are strictly within `[0.0, 1.0]`. This includes both action rewards and final score. All numerical outputs are floating-point values.
+**Observation Space**: The environment returns a Pydantic `State` object exposing:
+* `task_id`: Current sequence identifier
+* `current_clause`: A dictionary containing `id`, `text`, and legal `category`.
+* `clauses_reviewed`, `total_clauses`, `cumulative_reward`, `flags_raised`, `done`.
 
-*   **`flag`**: `0.2`
-*   **`escalate`**: `0.25`
-*   **`redline`**: `0.3`
-*   **`synthesize`**: `0.4`
+ALL rewards are floating-point values strictly bound within `[0.0, 1.0]`.
 
 ## 4. State Schema Integrity
 ALL request and response objects enforce strict Pydantic v2 schema declarations:
@@ -37,19 +54,19 @@ ALL request and response objects enforce strict Pydantic v2 schema declarations:
 *   `flags_raised`: List
 *   `done`: Boolean
 
-## 5. Execution Boundary Limits
-Computational limits enforce hard algorithmic cutoffs:
-1.  **`nda_review`**: Hard limit of 10 sequence steps.
-2.  **`saas_review`**: Hard limit of 15 sequence steps.
-3.  **`ma_review`**: Hard limit of 20 sequence steps.
+## 5. Tasks & Execution Boundaries
+Three distinct simulated workflows evaluate the agent under explicit step constraints:
+1.  **`nda_review` (Expected Difficulty: Easy)**: Hard limit of 10 sequential clause steps.
+2.  **`saas_review` (Expected Difficulty: Medium)**: Hard limit of 15 sequential clause steps.
+3.  **`ma_review` (Expected Difficulty: Hard)**: Hard limit of 20 sequential clause steps.
 
 Operations embed `psutil` natively to govern active resource stability, restricting consumption strictly to **2 vCPU / 8GB RAM**. Evaluator execution enforces a strict process termination upon exceeding a **20-minute** timeout variable.
 
-## 6. Immutable Logging Standard
-Logs EXACTLY match `[START]`, `[STEP]`, `[END]`. No additional or missing fields.
-*   `[START]`: Emitted once per task on episode initialization.
-*   `[STEP]`: Emitted once per clause iteration during the episode.
-*   `[END]`: Emitted once per task upon episode termination.
+## 6. Immutable CLI Logging Standard
+The evaluator (`inference.py`) produces EXACTLY three line formats continuously to `stdout`, omitting JSON multi-liners and debugging footprints for total reproducibility:
+*   `[START] task=<task_name> env=<benchmark> model=<model_name>`: Emitted once per task on episode initialization.
+*   `[STEP] step=<n> action=<action_str> reward=<0.00> done=<true|false> error=<msg|null>`: Emitted once per clause iteration.
+*   `[END] success=<true|false> steps=<n> score=<score> rewards=<r1,r2,...,rn>`: Emitted once upon episode termination to calculate standard final metrics.
 
 ## 7. Completeness Guarantee
 Zero placeholder variables, unfinished logic pathways, or development fragments exist across the module. All 9 required files establish perfect integrity:
