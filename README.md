@@ -32,10 +32,10 @@ The framework enforces absolute compliance with the Hackathon network constraint
 
 ## 3. RL Architecture & Authorized Actions
 Agents execute exactly four authorized actions matching the OpenEnv Pydantic `ActionParams` model:
-*   **`flag`**: `0.2` (identifies problematic clause)
-*   **`escalate`**: `0.25` (passes to human counsel)
-*   **`redline`**: `0.3` (mutates the clause text directly)
-*   **`synthesize`**: `0.4` (generates missing required clauses)
+*   **`approve`**: safe clause confirmed (+0.4)
+*   **`flag`**: high risk caught (+1.0) / over-flag penalty (-0.2)
+*   **`redline`**: clause rewritten (+0.7 to +0.9)
+*   **`escalate`**: ambiguous clause handled (+0.5 to +0.8)
 
 **Observation Space**: The environment returns a Pydantic `State` object exposing:
 * `task_id`: Current sequence identifier
@@ -52,6 +52,9 @@ ALL request and response objects enforce strict Pydantic v2 schema declarations:
 *   `total_clauses`: Integer
 *   `cumulative_reward`: Float
 *   `flags_raised`: List
+*   `is_ambiguous`: Boolean — marks intentionally ambiguous clauses
+*   `false_approvals`: List — high-risk clauses incorrectly approved
+*   `escalations`: List — clauses escalated by agent
 *   `done`: Boolean
 
 ## 5. Tasks & Execution Boundaries
@@ -80,3 +83,33 @@ Zero placeholder variables, unfinished logic pathways, or development fragments 
 7.   `Dockerfile`
 8.   `requirements.txt`
 9.   `README.md`
+
+## Example Output
+```text
+[START] task=nda_review env=legal_evaluation model=gpt-4
+[STEP] step=1 action=approve reward=0.40 done=false error=null
+[STEP] step=2 action=flag reward=1.00 done=false error=null
+[STEP] step=3 action=redline reward=0.80 done=false error=null
+...
+[END] success=true steps=10 score=0.847 rewards=0.40,1.00,0.80,...
+```
+
+## Setup & Run
+
+**Environment variables required:**
+```bash
+export API_BASE_URL="https://api.openai.com/v1"
+export MODEL_NAME="gpt-4"
+export HF_TOKEN="your_token_here"
+```
+
+**Run inference:**
+```bash
+python inference.py
+```
+
+**Run with Docker:**
+```bash
+docker build -t legal-contract-env .
+docker run -e API_BASE_URL=$API_BASE_URL -e MODEL_NAME=$MODEL_NAME -e HF_TOKEN=$HF_TOKEN legal-contract-env
+```

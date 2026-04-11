@@ -6,8 +6,14 @@ entry_point: "app.environment:LegalContractEnv"
 
 tasks:
   - id: nda_review
-    description: "Easy NDA review with 10 exact steps."
+    description: "Easy NDA review with 10 steps."
+    difficulty: easy
+    max_steps: 10
   - id: saas_review
-    description: "Medium SaaS review with 15 exact steps."
+    description: "Medium SaaS review with 15 steps."
+    difficulty: medium
+    max_steps: 15
   - id: ma_review
-    description: "Hard M&A review with 20 exact steps."
+    description: "Hard M&A review with 20 steps."
+    difficulty: hard
+    max_steps: 20
