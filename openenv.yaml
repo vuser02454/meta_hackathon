@@ -1,9 +1,7 @@
-name: legal-contract-review
-version: 1.0.0
-description: >
-  An LLM agent reviews legal contracts clause by clause,
-  flags risks, and suggests edits — scored automatically
-  across 3 difficulty levels.
+version: "1.0"
+name: "Legal Contract Review OpenEnv"
+description: "An LLM agent reviews legal contracts clause by clause, flags risks, and suggests edits — scored automatically across 3 difficulty levels."
+entry_point: "app.environment:LegalContractEnv"
 tasks:
   - id: nda_review
     description: "Easy NDA review — identify liability and confidentiality risks."
