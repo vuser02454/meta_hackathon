@@ -1,19 +1,19 @@
-version: "1.0"
-name: "Legal Contract Review OpenEnv"
-description: "Forensic legal contract review evaluating NDA, SaaS, and M&A logic."
-
-entry_point: "app.environment:LegalContractEnv"
-
+name: legal-contract-review
+version: 1.0.0
+description: >
+  An LLM agent reviews legal contracts clause by clause,
+  flags risks, and suggests edits — scored automatically
+  across 3 difficulty levels.
 tasks:
   - id: nda_review
-    description: "Easy NDA review with 10 steps."
+    description: "Easy NDA review — identify liability and confidentiality risks."
     difficulty: easy
     max_steps: 10
   - id: saas_review
-    description: "Medium SaaS review with 15 steps."
+    description: "Medium SaaS agreement — IP ownership, data privacy, SLA penalties."
     difficulty: medium
     max_steps: 15
   - id: ma_review
-    description: "Hard M&A review with 20 steps."
+    description: "Hard M&A term sheet — indemnity chains, jurisdiction, ambiguous clauses."
     difficulty: hard
     max_steps: 20

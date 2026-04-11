@@ -32,10 +32,14 @@ The framework enforces absolute compliance with the Hackathon network constraint
 
 ## 3. RL Architecture & Authorized Actions
 Agents execute exactly four authorized actions matching the OpenEnv Pydantic `ActionParams` model:
-*   **`approve`**: safe clause confirmed (+0.4)
-*   **`flag`**: high risk caught (+1.0) / over-flag penalty (-0.2)
-*   **`redline`**: clause rewritten (+0.7 to +0.9)
-*   **`escalate`**: ambiguous clause handled (+0.5 to +0.8)
+
+| Action   | Reward        | When to use                              |
+|----------|---------------|------------------------------------------|
+| approve  | +0.4          | Clause is standard and safe              |
+| flag     | +1.0 / -0.2   | High risk caught / over-flag penalty     |
+| redline  | +0.7 to +0.9  | Clause rewritten with safer version      |
+| escalate | +0.5 to +0.8  | Ambiguous clause sent to senior partner  |
+| approve on high-risk | -1.0 | Heavy penalty — never approve risky clauses |
 
 **Observation Space**: The environment returns a Pydantic `State` object exposing:
 * `task_id`: Current sequence identifier
@@ -46,16 +50,18 @@ ALL rewards are floating-point values strictly bound within `[0.0, 1.0]`.
 
 ## 4. State Schema Integrity
 ALL request and response objects enforce strict Pydantic v2 schema declarations:
-*   `task_id`: String
-*   `current_clause`: Complete object containing precisely `id`, `text`, and `category`.
-*   `clauses_reviewed`: Integer
-*   `total_clauses`: Integer
-*   `cumulative_reward`: Float
-*   `flags_raised`: List
-*   `is_ambiguous`: Boolean — marks intentionally ambiguous clauses
-*   `false_approvals`: List — high-risk clauses incorrectly approved
-*   `escalations`: List — clauses escalated by agent
-*   `done`: Boolean
+
+| Field            | Type    | Description                              |
+|------------------|---------|------------------------------------------|
+| task_id          | string  | Current task identifier                  |
+| current_clause   | object  | id, text, category, is_ambiguous         |
+| clauses_reviewed | int     | Clauses processed so far                 |
+| total_clauses    | int     | Total clauses in episode                 |
+| cumulative_reward| float   | Running reward total                     |
+| flags_raised     | list    | Clause IDs flagged by agent              |
+| false_approvals  | list    | High-risk clauses incorrectly approved   |
+| escalations      | list    | Clauses escalated by agent               |
+| done             | bool    | Episode complete flag                    |
 
 ## 5. Tasks & Execution Boundaries
 Three distinct simulated workflows evaluate the agent under explicit step constraints:
@@ -85,31 +91,24 @@ Zero placeholder variables, unfinished logic pathways, or development fragments 
 9.   `README.md`
 
 ## Example Output
-```text
+
 [START] task=nda_review env=legal_evaluation model=gpt-4
 [STEP] step=1 action=approve reward=0.40 done=false error=null
 [STEP] step=2 action=flag reward=1.00 done=false error=null
 [STEP] step=3 action=redline reward=0.80 done=false error=null
-...
 [END] success=true steps=10 score=0.847 rewards=0.40,1.00,0.80,...
-```
+[SUMMARY] tasks=3 avg_score=0.821 scores=0.847,0.803,0.812
 
 ## Setup & Run
 
-**Environment variables required:**
-```bash
+### Environment Variables Required
 export API_BASE_URL="https://api.openai.com/v1"
 export MODEL_NAME="gpt-4"
 export HF_TOKEN="your_token_here"
-```
 
-**Run inference:**
-```bash
+### Run Inference
 python inference.py
-```
 
-**Run with Docker:**
-```bash
+### Run with Docker
 docker build -t legal-contract-env .
-docker run -e API_BASE_URL=$API_BASE_URL -e MODEL_NAME=$MODEL_NAME -e HF_TOKEN=$HF_TOKEN legal-contract-env
-```
+docker run -e API_BASE_URL=... -e MODEL_NAME=... -e HF_TOKEN=... legal-contract-env

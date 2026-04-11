@@ -304,12 +304,18 @@ def main():
             score, steps = run_task(env, task, client)
             all_scores.append(score)
         except Exception as e:
-            print(f"[ERROR] task={task} error={type(e).__name__}: {e}", flush=True)
+            print(
+                f"[ERROR] task={task} error={type(e).__name__}: {e}",
+                flush=True
+            )
             all_scores.append(0.0)
 
-    if all_scores:
-        avg = sum(all_scores) / len(all_scores)
-        print(f"[SUMMARY] tasks={len(tasks)} avg_score={avg:.3f} scores={','.join(f'{s:.3f}' for s in all_scores)}", flush=True)
+    avg = sum(all_scores) / len(all_scores) if all_scores else 0.0
+    print(
+        f"[SUMMARY] tasks={len(tasks)} avg_score={avg:.3f} "
+        f"scores={','.join(f'{s:.3f}' for s in all_scores)}",
+        flush=True
+    )
 
 if __name__ == "__main__":
     main()
